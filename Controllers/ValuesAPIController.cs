@@ -33,7 +33,7 @@ namespace InventoryManager.Controllers
             {
                 Created = DateTime.Now,
                 Id = 1,
-                Name = "Test",
+                Name = "Test Data 1 ",
                 Description = "New Item"
             })
             .ToArray();
