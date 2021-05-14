@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using InventoryManager.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +12,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
+
 
 namespace InventoryManager
 {
@@ -26,6 +30,7 @@ namespace InventoryManager
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddGrpc();
             services.AddControllersWithViews();
 
             services.AddDbContext<InventoryDBContext>(options =>
@@ -33,7 +38,7 @@ namespace InventoryManager
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen();
-
+            
 
         }
 
@@ -67,12 +72,26 @@ namespace InventoryManager
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
+            app.UseEndpoints((Action<Microsoft.AspNetCore.Routing.IEndpointRouteBuilder>)(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
+
+                
+                GrpcEndpointRouteBuilderExtensions.MapGrpcService<InvServ>(endpoints);
+
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+                });
+               
+                
+            }));
+
+
+
+
         }
     }
 }
